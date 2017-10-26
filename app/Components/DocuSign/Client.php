@@ -2,7 +2,11 @@
 
 namespace App\Components\DocuSign;
 
-use \GuzzleHttp\Client as gClient;
+use Guzzle\Plugin\History\HistoryPlugin;
+use GuzzleHttp\Client as gClient;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\MultipartStream;
 
 class Client
 {
@@ -11,6 +15,7 @@ class Client
         'X-DocuSign-Authentication' => null,
     ];
     protected $client = null;
+    protected $history = null;
     protected $baseUrl = null;
 
     /* Consts urls */
@@ -19,6 +24,10 @@ class Client
     public function __construct($username, $password, $integratorKey)
     {
         $this->client = new gClient();
+        $this->history = new HistoryPlugin();
+//        $this->history->setLimit(5);
+//        $this->client->addSubscriber($this->history);
+
         $this->headers['X-DocuSign-Authentication'] = json_encode([
             'Username' => $username,
             'Password' => $password,
@@ -47,7 +56,7 @@ class Client
     }
 
 
-    public function sendEnvelopes(array $options, callable $recipients)
+    public function sendEnvelopesWithTemplate(array $options, callable $recipients)
     {
         if (!isset($options['templateId']))
             throw new \Exception('$options[\'templateId\'] required');
@@ -66,12 +75,85 @@ class Client
                 'status' => 'sent',
                 'emailSubject' => $options['subject'] ?? 'Example Template attach data',
                 'templateId' => $options['templateId'],
-                'templateRoles' => $recipients()
+                'templateRoles' => $recipients(),
             ]
         ];
 
         try {
             $request = $this->client->request('POST', $this->baseUrl . '/envelopes/', $options);
+            return $request->getBody()->getContents();
+        } catch (\Exception $e) {
+            dd($e);
+        }
+    }
+
+    public function sendEnvelopesWithFile(array $options, callable $recipients)
+    {
+//        if (!isset($options['templateId']))
+//            throw new \Exception('$options[\'templateId\'] required');
+        $stream = fopen(__DIR__ . '/../../../public/pdf/template.pdf', 'r');
+        $boundary = uniqid('12345');
+
+        $options = [
+            'debug' => true,
+            'headers' => [
+                'X-DocuSign-Authentication' => $this->headers['X-DocuSign-Authentication'],
+                'headers' => [
+                    "X-DocuSign-SDK" => "PHP",
+                    'User-Agent' => $this->userAgent,
+                    'Content-Type' => 'application/json',
+                    'Content-Disposition' => 'form-data;',
+                ]
+            ],
+            'body' => new MultipartStream([
+//            'multipart' => [
+//                [
+//                    'name'     => 'template.pdf',
+//                    'contents' => $stream
+//                ],
+//                [
+//                    'name'     => 'csv_header',
+//                    'contents' => 'First Name, Last Name, Username',
+//                    'filename' => 'csv_header.csv'
+//                ]
+                [
+                    'name' => 'file',
+                    'contents' => $stream,
+                    'filename' => 'template.pdf',
+                    'headers' => [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'file; filename="template.pdf"; documentid=1',
+                    ]
+
+                ]
+            ], $boundary),
+            'json' => [
+                'status' => 'sent',
+                'emailSubject' => 'subject',
+                'compositeTemplates' => [
+                    [
+                        'inlineTemplates' => [
+                            [
+                                'sequence' => '1',
+                                'recipients' => [
+                                    'signers' => $recipients()
+                                ]
+                            ]
+                        ],
+                        'document' => [
+                            'documentId' => '1',
+                            'name' => 'template.pdf',
+                            'transformPdfFields' => 'true'
+                        ]
+                    ],
+                ]
+            ]
+        ];
+//        dd($options);
+
+        try {
+            $request = $this->client->request('POST', $this->baseUrl . '/envelopes/', $options);
+//            dd($this->history);
             return $request->getBody()->getContents();
         } catch (\Exception $e) {
             dd($e);

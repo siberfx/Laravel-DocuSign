@@ -16,3 +16,4 @@ Route::get('/', function () {
 });
 
 Route::get('/test-sdk', 'Document@send')->name('sdk');
+Route::get('/test-file', 'Document@file')->name('file');
