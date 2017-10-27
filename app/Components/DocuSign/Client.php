@@ -4,9 +4,6 @@ namespace App\Components\DocuSign;
 
 use Guzzle\Plugin\History\HistoryPlugin;
 use GuzzleHttp\Client as gClient;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\MultipartStream;
 
 class Client
 {
@@ -24,9 +21,6 @@ class Client
     public function __construct($username, $password, $integratorKey)
     {
         $this->client = new gClient();
-        $this->history = new HistoryPlugin();
-//        $this->history->setLimit(5);
-//        $this->client->addSubscriber($this->history);
 
         $this->headers['X-DocuSign-Authentication'] = json_encode([
             'Username' => $username,
@@ -55,7 +49,14 @@ class Client
         return new Template($templateInfo);
     }
 
-
+    /**
+     * send template
+     *
+     * @param array $options
+     * @param callable $recipients
+     * @return string
+     * @throws \Exception
+     */
     public function sendEnvelopesWithTemplate(array $options, callable $recipients)
     {
         if (!isset($options['templateId']))
@@ -87,77 +88,93 @@ class Client
         }
     }
 
-    public function sendEnvelopesWithFile(array $options, callable $recipients)
+    /**
+     * send file
+     *
+     * @param callable $recipients
+     * @return string
+     */
+    public function sendFile(callable $recipients)
     {
-//        if (!isset($options['templateId']))
-//            throw new \Exception('$options[\'templateId\'] required');
-        $stream = fopen(__DIR__ . '/../../../public/pdf/template.pdf', 'r');
-        $boundary = uniqid('12345');
+        $stream = file_get_contents(__DIR__ . '/../../../public/pdf/template.pdf');
+        $file_data_string = "--myboundary\r\n"
+            ."Content-Type:application/pdf\r\n"
+            ."Content-Disposition: file; filename=\"template.pdf\"; documentid=1 \r\n"
+            ."\r\n"
+            ."$stream\r\n";
 
-        $options = [
-            'debug' => true,
-            'headers' => [
-                'X-DocuSign-Authentication' => $this->headers['X-DocuSign-Authentication'],
-                'headers' => [
-                    "X-DocuSign-SDK" => "PHP",
-                    'User-Agent' => $this->userAgent,
-                    'Content-Type' => 'application/json',
-                    'Content-Disposition' => 'form-data;',
-                ]
-            ],
-            'body' => new MultipartStream([
-//            'multipart' => [
-//                [
-//                    'name'     => 'template.pdf',
-//                    'contents' => $stream
-//                ],
-//                [
-//                    'name'     => 'csv_header',
-//                    'contents' => 'First Name, Last Name, Username',
-//                    'filename' => 'csv_header.csv'
-//                ]
+        $json = json_encode([
+            'status' => 'sent',
+            'emailSubject' => 'subject',
+            'compositeTemplates' => [
                 [
-                    'name' => 'file',
-                    'contents' => $stream,
-                    'filename' => 'template.pdf',
-                    'headers' => [
-                        'Content-Type' => 'application/pdf',
-                        'Content-Disposition' => 'file; filename="template.pdf"; documentid=1',
-                    ]
-
-                ]
-            ], $boundary),
-            'json' => [
-                'status' => 'sent',
-                'emailSubject' => 'subject',
-                'compositeTemplates' => [
-                    [
-                        'inlineTemplates' => [
-                            [
-                                'sequence' => '1',
-                                'recipients' => [
-                                    'signers' => $recipients()
-                                ]
+                    'inlineTemplates' => [
+                        [
+                            'sequence' => '1',
+                            'recipients' => [
+                                'signers' => $recipients()
                             ]
-                        ],
-                        'document' => [
-                            'documentId' => '1',
-                            'name' => 'template.pdf',
-                            'transformPdfFields' => 'true'
                         ]
                     ],
-                ]
+                    'document' => [
+                        'documentId' => '1',
+                        'name' => 'template.pdf',
+                        'transformPdfFields' => 'true'
+                    ]
+                ],
             ]
-        ];
-//        dd($options);
+        ]);
 
-        try {
-            $request = $this->client->request('POST', $this->baseUrl . '/envelopes/', $options);
-//            dd($this->history);
-            return $request->getBody()->getContents();
-        } catch (\Exception $e) {
-            dd($e);
-        }
+        $data_string = "\r\n"
+            ."\r\n"
+            ."--myboundary\r\n"
+            ."Content-Type: application/json\r\n"
+            ."Content-Disposition: form-data\r\n"
+            ."\r\n"
+            ."$json\r\n"
+            .$file_data_string
+            ."--myboundary--\r\n"
+            ."\r\n";
+
+        $body = [
+//            'debug' => true,
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'multipart/form-data;boundary=myboundary',
+                'Content-Length' => strlen($data_string),
+                'X-DocuSign-Authentication' => $this->headers['X-DocuSign-Authentication']
+            ],
+            'body' => $data_string
+        ];
+
+        $request = $this->client->request('POST', $this->baseUrl . '/envelopes/', $body);
+        return $request->getBody()->getContents();
+    }
+
+
+    public function getFinalUrl($envelopeId)
+    {
+        $data = json_encode([
+            "userName" => 'Anton Klochkov',
+            "email" => 'ilyrium@yandex.com',
+            "recipientId" => "1",
+            "clientUserId" => 'ilyrium@yandex.com',
+            "authenticationMethod" => "email",
+            "returnUrl" => "https://www.docusign.com/devcenter/?viewing_complete=read-only"
+        ]);
+
+        $body = [
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen($data),
+                'X-DocuSign-Authentication' => $this->headers['X-DocuSign-Authentication']
+            ],
+            'body' => $data
+        ];
+
+        $request = $this->client->request('POST', $this->baseUrl . '/envelopes/' . $envelopeId . '/views/recipient/', $body);
+        return $request->getBody()->getContents();
     }
 
 

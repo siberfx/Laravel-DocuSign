@@ -74,11 +74,13 @@ class Template extends Collection
     {
         $tabsText = [];
         foreach ($data as $key => $value) {
-            $tabsText[] = [
-                'tabLabel' => $key,
-                'value' => $value,
-                'locked' => true
-            ];
+            if($value != null) {
+                $tabsText[] = [
+                    'tabLabel' => $key,
+                    'value' => $value,
+                    'locked' => true
+                ];
+            }
         }
         return $tabsText;
     }
@@ -88,15 +90,34 @@ class Template extends Collection
     {
         $tabRadio = [];
         foreach ($data as $key => $value) {
-            $tabRadio[] = [
-                'groupName' => $key,
-                'radios' => [
-                    'value' => $value,
-                    'selected' => true,
-                    'locked' => true
-                ]
-            ];
+            if($value != null) {
+                $tabRadio[] = [
+                    'groupName' => $key,
+                    'radios' => [
+                        [
+                            'value' => $value,
+                            'selected' => true,
+                            'locked' => true
+                        ]
+                    ]
+                ];
+            }
         }
         return $tabRadio;
+    }
+
+
+    public static function fileCheckboxTabs($data)
+    {
+        $checkbox = [];
+        foreach ($data as $key => $value) {
+            if($value != null) {
+                $checkbox[] = [
+                    "tabLabel" => $key,
+                    "selected" => true,
+                    "locked" => true,
+                ];
+            }
+        }
     }
 }
