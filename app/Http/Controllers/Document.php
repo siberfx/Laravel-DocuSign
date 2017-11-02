@@ -6,6 +6,7 @@ use App\Components\DocuSign\Client;
 use App\Components\DocuSign\Template;
 use App\Error;
 use App\FuwMapping;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class Document extends Controller
@@ -82,59 +83,87 @@ class Document extends Controller
      */
     public function file()
     {
-        try {
-            $client = new Client(
-                config('docusign.username'),
-                config('docusign.password'),
-                config('docusign.integrator_key'));
+//        try {
+        $start = microtime(true);
+        $client = new Client(
+            config('docusign.username'),
+            config('docusign.password'),
+            config('docusign.integrator_key'));
 
-            # Get data with Json for send
-            $sendData = FuwMapping::getMapping();
+        # Get data with Json for send
+        $sendData = FuwMapping::getMapping();
+//            $sendData['text']['Ben_home_state1'] = 'Nebraska';
+//            $sendData['text']['Ben_home_state2'] = 'Vrn';
+//        dd($sendData);
 
-            $peoples = collect([
-                [
-                    'email' => 'ilyrium@yandex.com',
-                    'name' => 'Anton Klochkov'
-                ]
-            ]);
+        $peoples = collect([
+            [
+                'email' => 'ilyrium@yandex.com',
+                'name' => 'Anton Klochkov'
+            ]
+        ]);
 
-            # send envelopers with dynamic data
-            $response = $client->sendFile(function () use ($peoples, $sendData) {
-                return $peoples->map(function ($people) use ($sendData) {
-                    return [
-                        'email' => $people['email'],
-                        'name' => $people['name'],
-                        'recipientId' => '1',
-                        'clientUserId' => $people['email'],
-                        'routingOrder' => '1',
-                        'tabs' => [
-                            'textTabs' => Template::fileTextTabs($sendData['text']),
-                            'radioGroupTabs' => Template::fileRadioGroupTabs($sendData['radio']),
-                            'checkboxTabs' => Template::fileCheckboxTabs($sendData['checkbox'])
-                        ]
-                    ];
-                })->toArray();
-            });
-            $response = json_decode($response);
-            $envelopeId = $response->envelopeId;
+        # send envelopers with dynamic data
+        $response = $client->sendFile(function () use ($peoples, $sendData) {
+            return $peoples->map(function ($people) use ($sendData) {
+                return [
+                    'email' => $people['email'],
+                    'name' => $people['name'],
+                    'recipientId' => '1',
+                    'clientUserId' => $people['email'],
+                    'routingOrder' => '1',
+                    'tabs' => [
+                        'textTabs' => Template::fileTextTabs($sendData['text']),
+                        'radioGroupTabs' => Template::fileRadioGroupTabs($sendData['radio']),
+                        'checkboxTabs' => Template::fileCheckboxTabs($sendData['checkbox'])
+                    ]
+                ];
+            })->toArray();
+        });
+        $response = json_decode($response);
+        $envelopeId = $response->envelopeId;
 
-            # get the final url, without sending a letter to the mail
-            $finalUrl = $client->getFinalUrl($envelopeId);
-            dd($finalUrl);
+        # get the final url, without sending a letter to the mail
+        $finalUrl = $client->getFinalUrl($envelopeId);
 
-        } catch (\Exception $e) {
-            # create log error to DB
-            Error::create([
-                'value' => $e->getMessage()
-            ]);
+        $timeScript = round(microtime(true) - $start, 4);
+        dd($finalUrl, $timeScript);
 
-            # send message to support
-            Mail::send('email', [], function ($m) {
-                $m->from('hello@app.com', 'Your Application');
-                $m->to('myLyrium@gmail.com', $name = null)->subject('Error!');
-            });
-            dd($e);
-        }
+//        } catch (\Exception $e) {
+//            # create log error to DB
+//            Error::create([
+//                'value' => $e->getMessage()
+//            ]);
+//
+//            # send message to support
+//            Mail::send('email', [], function ($m) {
+//                $m->from('hello@app.com', 'Your Application');
+//                $m->to('myLyrium@gmail.com', $name = null)->subject('Error!');
+//            });
+//            dd($e);
+//        }
+    }
+
+
+    public function show()
+    {
+        return view('file');
+    }
+
+    public function getFiles(Request $request)
+    {
+        dd($request);
+    }
+
+
+    public function test()
+    {
+        $array = ['products' => ['desk' => [1 => 100]]];
+
+        $array = ['products' => [['price' => 100], ['price' => 200]]];
+
+        $price = array_get($array, 'products.0.price');
+        dd($price);
     }
 
 }

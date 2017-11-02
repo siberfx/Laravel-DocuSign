@@ -15,5 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test-sdk', 'Document@send')->name('sdk');
-Route::get('/test-file', 'Document@file')->name('file');
+Route::get('/send/template', 'Document@send')->name('sdk');
+Route::get('/send/file', 'Document@file')->name('send-file');
+Route::get('/test', 'Document@test')->name('test');
+
+Route::get('/get/file', 'Document@show')->name('show');
+Route::post('/get/file', 'Document@getFiles')->name('get-file');
+

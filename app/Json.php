@@ -163,7 +163,7 @@ class Json
             "$$hashKey": "object:290"
           },
           "zip": "11375",
-          "birth": "01011980"
+          "birth": "01/01/1980"
         }
       ],
       "amount": 500000,
@@ -535,7 +535,7 @@ class Json
         },
         "zip": "11375",
         "phone": "2122222222",
-        "date_x": "01011980",
+        "date_x": "01/01/1980",
         "reason": "My reason"
       },
       "marijuanaLastUsed": "012000",
