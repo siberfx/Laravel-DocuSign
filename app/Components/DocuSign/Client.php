@@ -94,18 +94,23 @@ class Client
      * @param callable $recipients
      * @return string
      */
-    public function sendFile(callable $recipients)
+    public function sendFile(array $userData, callable $recipients)
     {
-        $stream = file_get_contents(__DIR__ . '/../../../public/pdf/template.pdf');
+//        $stream = file_get_contents(__DIR__ . '/../../../public/pdf/template.pdf');
+        $stream = file_get_contents($userData['file']['file']);
+        $fileName = $userData['file']['file']->getClientOriginalName();
+
+
         $file_data_string = "--myboundary\r\n"
             ."Content-Type:application/pdf\r\n"
-            ."Content-Disposition: file; filename=\"template.pdf\"; documentid=1 \r\n"
+            ."Content-Disposition: file; filename=\"$fileName\"; documentid=1 \r\n"
+//            ."Content-Disposition: file; filename=\"template.pdf\"; documentid=1 \r\n"
             ."\r\n"
             ."$stream\r\n";
 
         $json = json_encode([
             'status' => 'sent',
-            'emailSubject' => 'subject',
+            'emailSubject' => $userData['emailSubject'],
             'compositeTemplates' => [
                 [
                     'inlineTemplates' => [
@@ -118,7 +123,7 @@ class Client
                     ],
                     'document' => [
                         'documentId' => '1',
-                        'name' => 'template.pdf',
+                        'name' => $fileName,
                         'transformPdfFields' => 'true'
                     ]
                 ],

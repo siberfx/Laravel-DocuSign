@@ -16,39 +16,22 @@ class FuwMapping extends Model
     protected $guarded = ['id'];
 
 
-    protected static function getMapping()
+    protected static function getMapping($userData)
     {
-        #get JSON
-        $jsonData = Json::get();
-        $jsonData = self::convert($jsonData);
+        $json = $userData['json'];
+        $file = $userData['file']['file']->getClientOriginalName();
+        $filename = pathinfo($file, PATHINFO_FILENAME);
+
+        #convert JSON
+        $jsonData = self::convert($json);
 //        dd($jsonData);
 
-//        $jsonData = collect($jsonData)->map(function ($item) {
-//            if(is_array($item)){
-//                foreach ($item as $value) {
-//                    $array[] = (array)$value;
-////                    foreach ($value as $key => $arr) {
-////                        if(is_object($arr)){
-////                            foreach ($arr as $a) {
-////                                $array[$key] = (array)$a;
-////                            }
-////                        }
-////                    }
-//
-//                }
-//                return $array;
-//            }
-//            return (array)$item;
-//        })->toArray();
-//        dd($jsonData);
-
-        $textMappingCollection = self::where('type', '=', 'text')->get();
-        $radioMappingCollection = self::where('type', '=', 'radio')->get();
-        $checkboxMappingCollection = self::where('type', '=', 'checkbox')->get();
-
+        $textMappingCollection = self::where('type', '=', 'text')->where('template', '=', $filename)->get();
+        $radioMappingCollection = self::where('type', '=', 'radio')->where('template', '=', $filename)->get();
+        $checkboxMappingCollection = self::where('type', '=', 'checkbox')->where('template', '=', $filename)->get();
         $sendData = [];
-        foreach ($textMappingCollection as $item) {
 
+        foreach ($textMappingCollection as $item) {
             if ($item->options == 'multiple' and $item->max_range_items == 2) {
                 $full = explode('.', $item->json_field);
                 $i = 1;
@@ -77,12 +60,9 @@ class FuwMapping extends Model
                         }
                     }
                 }
-//                dd($sendData);
-
                 $sendData['text'][$item->pdf_field] = $value;
             }
         }
-//        dd($sendData);
 
         foreach ($radioMappingCollection as $item) {
             if ($item->options == 'multiple' and $item->max_range_items == 2) {
@@ -116,6 +96,8 @@ class FuwMapping extends Model
             } else {
                 $field = $item->json_field;
                 $value = array_get($jsonData, $field);
+                if(is_array($value))
+                    $value = $value[0]['selected'];
                 $sendData['checkbox'][$item->pdf_field] = $value;
             }
         }
