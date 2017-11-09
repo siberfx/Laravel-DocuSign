@@ -91,55 +91,73 @@ class Client
     /**
      * send file
      *
-     * @param callable $recipients
+     * @param array $userData
+     * @param array $sendData
      * @return string
      */
-    public function sendFile(array $userData, callable $recipients)
+    public function sendFile(array $userData, array $sendData)
     {
-//        $stream = file_get_contents(__DIR__ . '/../../../public/pdf/template.pdf');
-        $stream = file_get_contents($userData['file']['file']);
-        $fileName = $userData['file']['file']->getClientOriginalName();
+        $compositeTemplates = [];
+        $file_data_string = "";
+        $id = 1;
 
+        foreach ($userData['file'] as $file) {
+            $stream = file_get_contents($file);
+            $filename = $file->getClientOriginalName();
+            $withoutExtension = pathinfo($filename, PATHINFO_FILENAME);
 
-        $file_data_string = "--myboundary\r\n"
-            ."Content-Type:application/pdf\r\n"
-            ."Content-Disposition: file; filename=\"$fileName\"; documentid=1 \r\n"
-//            ."Content-Disposition: file; filename=\"template.pdf\"; documentid=1 \r\n"
-            ."\r\n"
-            ."$stream\r\n";
+            $file_data_string .= "--myboundary\r\n"
+                . "Content-Type:application/pdf\r\n"
+                . "Content-Disposition: file; filename=\"$filename\"; documentid=$id \r\n"
+                . "\r\n"
+                . "$stream\r\n";
+
+            $compositeTemplates[] = [
+                'inlineTemplates' => [
+                    [
+                        'sequence' => '1',
+                        'recipients' => [
+                            'signers' => [
+                                [
+                                    'email' => $userData['email'],
+                                    'name' => $userData['name'],
+                                    'recipientId' => '1',
+                                    'clientUserId' => $userData['email'],
+                                    'routingOrder' => '1',
+                                    'tabs' => [
+                                        'textTabs' => Template::fileTextTabs($sendData[$withoutExtension]['text']),
+                                        'radioGroupTabs' => Template::fileRadioGroupTabs($sendData[$withoutExtension]['radio']),
+                                        'checkboxTabs' => Template::fileCheckboxTabs($sendData[$withoutExtension]['checkbox'])
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'document' => [
+                    'documentId' => $id,
+                    'name' => $filename,
+                    'transformPdfFields' => 'true'
+                ]
+            ];
+            $id++;
+        }
 
         $json = json_encode([
             'status' => 'sent',
             'emailSubject' => $userData['emailSubject'],
-            'compositeTemplates' => [
-                [
-                    'inlineTemplates' => [
-                        [
-                            'sequence' => '1',
-                            'recipients' => [
-                                'signers' => $recipients()
-                            ]
-                        ]
-                    ],
-                    'document' => [
-                        'documentId' => '1',
-                        'name' => $fileName,
-                        'transformPdfFields' => 'true'
-                    ]
-                ],
-            ]
-        ]);
+            'compositeTemplates' => $compositeTemplates]);
 
         $data_string = "\r\n"
-            ."\r\n"
-            ."--myboundary\r\n"
-            ."Content-Type: application/json\r\n"
-            ."Content-Disposition: form-data\r\n"
-            ."\r\n"
-            ."$json\r\n"
-            .$file_data_string
-            ."--myboundary--\r\n"
-            ."\r\n";
+            . "\r\n"
+            . "--myboundary\r\n"
+            . "Content-Type: application/json\r\n"
+            . "Content-Disposition: form-data\r\n"
+            . "\r\n"
+            . "$json\r\n"
+            . $file_data_string
+            . "--myboundary--\r\n"
+            . "\r\n";
 
         $body = [
 //            'debug' => true,
@@ -156,14 +174,20 @@ class Client
         return $request->getBody()->getContents();
     }
 
-
-    public function getFinalUrl($envelopeId)
+    /**
+     * get final link to DocuSign documents
+     *
+     * @param $envelopeId
+     * @param array $userData
+     * @return string
+     */
+    public function getFinalUrl($envelopeId, array $userData)
     {
         $data = json_encode([
-            "userName" => 'Anton Klochkov',
-            "email" => 'ilyrium@yandex.com',
+            "userName" => $userData['name'],
+            "email" => $userData['email'],
             "recipientId" => "1",
-            "clientUserId" => 'ilyrium@yandex.com',
+            "clientUserId" => $userData['email'],
             "authenticationMethod" => "email",
             "returnUrl" => "https://www.docusign.com/devcenter/?viewing_complete=read-only"
         ]);

@@ -26,7 +26,9 @@
                         <input type="email" class="form-control" name="email" value="iLyrium@yandex.com">
 
                         <h4>Send file</h4>
-                        <input name="file" class="form-control" type="file">
+                        <input name="0" class="form-control" type="file">
+                        <input name="1" class="form-control" type="file">
+                        <input name="2" class="form-control" type="file">
                         <br>
                         <button type="submit" class="btn btn-primary btn-labeled pull-right">
                             Send

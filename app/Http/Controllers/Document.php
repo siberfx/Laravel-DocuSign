@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Components\DocuSign\Client;
-use App\Components\DocuSign\Template;
 use App\Error;
 use App\FuwMapping;
 use App\Json;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
 
 class Document extends Controller
@@ -20,58 +18,86 @@ class Document extends Controller
      */
     public function sendTemplate()
     {
-        try {
-            $client = new Client(
-                config('docusign.username'),
-                config('docusign.password'),
-                config('docusign.integrator_key'));
+//        try {
+        $client = new Client(
+            config('docusign.username'),
+            config('docusign.password'),
+            config('docusign.integrator_key')
+        );
 
-            $templateId = '65a8d5ae-7620-4700-a538-92f96ddf0dc0'; // production template
-            $template = $client->getTemplateInfo($templateId);
 
-            /*
-             * test data
-            $templateId = '4daf41b8-a7d9-4a97-8477-129bec38147b'; // my test template
-            $sendData = [
-                'text' => ['myText' => 'test'],
-                'radio' => ['groupCountry' => 'us']
-            ];
-            */
+//             * test data
+        $templateId = '4daf41b8-a7d9-4a97-8477-129bec38147b'; // my test template
+        $sendData = [
+            'text' => ['myText' => 'test'],
+            'radio' => ['groupCountry' => 'us'],
+            'checkbox' => ['check' => true]
+        ];
 
-            $sendData = FuwMapping::getMapping();
+//            $templateId = '65a8d5ae-7620-4700-a538-92f96ddf0dc0'; // production template
+        $template = $client->getTemplateInfo($templateId);
 
-            $peoples = collect([
-                [
-                    'email' => 'ilyrium@yandex.com',
-                    'name' => 'Anton Klochkov'
-                ]
-            ]);
+//            $sendData = FuwMapping::getMapping();
 
-            # global options envelopers
-            $options = [
-                'templateId' => $templateId,
-                'subject' => 'Test new SDK'
-            ];
+        $peoples = collect([
+            [
+                'email' => 'ilyrium@yandex.com',
+                'name' => 'Anton Klochkov'
+            ]
+        ]);
 
-            # send envelopers with dynamic data
-            $response = $client->sendEnvelopesWithTemplate($options, function () use ($peoples, $template, $sendData) {
-                return $peoples->map(function ($people) use ($template, $sendData) {
-                    return [
-                        'RoleName' => 'signer',
-                        'name' => $people['name'],
-                        'email' => $people['email'],
-                        'tabs' => [
-                            'textTabs' => $template->getTextTabsWithData($sendData['text']),
-//                        'radioGroupTabs' => $template->getRadioGroupTabsWithData($sendData['radio'])
+        # global options envelopers
+        $options = [
+            'templateId' => $templateId,
+            'subject' => 'Test new SDK'
+        ];
+
+        # send envelopers with dynamic data
+        $response = $client->sendEnvelopesWithTemplate($options, function () use ($peoples, $template, $sendData) {
+            return $peoples->map(function ($people) use ($template, $sendData) {
+                return [
+                    'RoleName' => 'signer',
+                    'name' => $people['name'],
+                    'email' => $people['email'],
+                    'tabs' => [
+                        'textTabs' => $template->getTextTabsWithData($sendData['text']),
+                        'radioGroupTabs' => $template->getRadioGroupTabsWithData($sendData['radio']),
+//                        'radioGroupTabs' => [
+//                            ['groupName' => 'groupCountry',
+//                                'radios' => [
+//                                    ['value' => 'us', 'selected' => 'True', 'locked' => true],
+//                                    ['value' => 'no', 'selected' => 'false', 'locked' => true]
+//                                ]
+//                            ]
+//                        ],
+                        'checkboxTabs' => [
+                            [
+                                "tabLabel" => "check",
+                                "selected" => true,
+                                "locked" => true,
+                                "name" => "",
+                                "shared" => "false",
+                                "requireInitialOnSharedChange" => "false",
+                                "required" => "false",
+                                "documentId" => "34528174",
+                                "recipientId" => "37686734",
+                                "pageNumber" => "1",
+                                "xPosition" => "330",
+                                "yPosition" => "255",
+                                "tabId" => "ca9418fc-8762-4009-b8b6-9954f97389ba",
+                                "templateLocked" => "false",
+                                "templateRequired" => "false",
+                            ]
                         ]
-                    ];
-                })->toArray();
-            });
-            dd($response);
+                    ]
+                ];
+            })->toArray();
+        });
+        dd($response);
 
-        } catch (\Exception $e) {
-            $this->saveAndSendError($e);
-        }
+//        } catch (\Exception $e) {
+//            $this->saveAndSendError($e);
+//        }
     }
 
     /**
@@ -82,52 +108,28 @@ class Document extends Controller
     public function sendFile(array $userData)
     {
 //        try {
-//        $start = microtime(true);
         $client = new Client(
             config('docusign.username'),
             config('docusign.password'),
-            config('docusign.integrator_key'));
+            config('docusign.integrator_key')
+        );
 
         # Get data with Json for send
-        $sendData = FuwMapping::getMapping($userData);
+        $sendData = FuwMapping::getMapping($userData['file'], $userData['json']);
 //        dd($sendData);
-
-        $peoples = collect([
-            [
-                'email' => $userData['email'],
-                'name' => $userData['name']
-            ]
-        ]);
-
         # send envelopers with dynamic data
-        $response = $client->sendFile($userData, function () use ($peoples, $sendData) {
-            return $peoples->map(function ($people) use ($sendData) {
-                return [
-                    'email' => $people['email'],
-                    'name' => $people['name'],
-                    'recipientId' => '1',
-                    'clientUserId' => $people['email'],
-                    'routingOrder' => '1',
-                    'tabs' => [
-                        'textTabs' => Template::fileTextTabs($sendData['text']),
-                        'radioGroupTabs' => Template::fileRadioGroupTabs($sendData['radio']),
-                        'checkboxTabs' => Template::fileCheckboxTabs($sendData['checkbox'])
-                    ]
-                ];
-            })->toArray();
-        });
+        $response = $client->sendFile($userData, $sendData);
+
         $response = json_decode($response);
         $envelopeId = $response->envelopeId;
 
         # get the final url, without sending a letter to the mail
-        $finalUrl = json_decode($client->getFinalUrl($envelopeId));
-//        $timeScript = round(microtime(true) - $start, 4);
+        $finalUrl = json_decode($client->getFinalUrl($envelopeId, $userData));
 
         return $finalUrl->url;
 
 //        } catch (\Exception $e) {
 //            $this->saveAndSendError($e);
-
 //        }
     }
 
@@ -144,9 +146,8 @@ class Document extends Controller
             'email' => $request->email,
             'emailSubject' => $request->emailSubject,
             'file' => $request->file(),
-            'json' => Json::get()
+            'json' => json_decode(Json::new(), true)
         ];
-
         $finalUrl = $this->sendFile($userData);
 
         dd($finalUrl);

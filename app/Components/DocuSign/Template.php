@@ -20,6 +20,7 @@ class Template extends Collection
     {
 
         $tabs = $this->getTabs('textTabs');
+//        dd((array)$tabs[0]);
         $tabs = collect($tabs)->map(function ($tab) use ($data) {
             $tab = (array)$tab;
             foreach ($data as $key => $replaceTab) {
@@ -66,7 +67,8 @@ class Template extends Collection
 
     public function getCheckboxTabsWithData($data)
     {
-        // checkboxTabs
+        $tabs = $this->getTabs('checkboxTabs');
+        dd($tabs, $data);
     }
 
 
@@ -78,7 +80,9 @@ class Template extends Collection
                 $tabsText[] = [
                     'tabLabel' => $key,
                     'value' => $value,
-                    'locked' => true
+                    'locked' => true,
+                    'fontColor' => 'Purple',
+                    'fontSize' => 'Size14',
                 ];
             }
         }
@@ -115,9 +119,10 @@ class Template extends Collection
                 $checkbox[] = [
                     "tabLabel" => $key,
                     "selected" => true,
-                    "locked" => true,
+                    "locked" => true
                 ];
             }
         }
+        return $checkbox;
     }
 }
