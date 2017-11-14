@@ -29,6 +29,7 @@
                         <input name="0" class="form-control" type="file">
                         <input name="1" class="form-control" type="file">
                         <input name="2" class="form-control" type="file">
+                        <input name="3" class="form-control" type="file">
                         <br>
                         <button type="submit" class="btn btn-primary btn-labeled pull-right">
                             Send

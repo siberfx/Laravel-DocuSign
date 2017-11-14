@@ -146,8 +146,9 @@ class Document extends Controller
             'email' => $request->email,
             'emailSubject' => $request->emailSubject,
             'file' => $request->file(),
-            'json' => json_decode(Json::new(), true)
+            'json' => json_decode(Json::get(), true)
         ];
+//        dd($userData);
         $finalUrl = $this->sendFile($userData);
 
         dd($finalUrl);

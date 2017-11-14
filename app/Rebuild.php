@@ -17,9 +17,11 @@ class Rebuild extends Model
     public static function rebuild($data)
     {
         $fields = self::get();
+
         foreach ($fields as $field) {
             $path = $field->path;
             $array = array_get($data, $path);
+
 
             foreach ($array as $key => $value) {
                 $array[$value['id']] = $value;

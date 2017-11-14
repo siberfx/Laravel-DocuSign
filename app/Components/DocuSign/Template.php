@@ -75,17 +75,30 @@ class Template extends Collection
     public static function fileTextTabs($data)
     {
         $tabsText = [];
-        foreach ($data as $key => $value) {
+        foreach ($data['main'] as $key => $value) {
             if($value != null) {
                 $tabsText[] = [
                     'tabLabel' => $key,
                     'value' => $value,
                     'locked' => true,
                     'fontColor' => 'Purple',
-                    'fontSize' => 'Size14',
+                    'fontSize' => 'Size12',
                 ];
             }
         }
+        if(isset($data['collect'])) {
+            foreach ($data['collect'] as $key => $value) {
+            if($value != null) {
+                $tabsText[] = [
+                    'tabLabel' => $key,
+                    'value' => $value,
+                    'locked' => true,
+                    'fontColor' => 'Purple',
+                    'fontSize' => 'Size7',
+                ];
+            }
+        }}
+
         return $tabsText;
     }
 

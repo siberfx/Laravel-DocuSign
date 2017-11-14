@@ -46,7 +46,7 @@ class FuwMapping extends Model
                     $valueMultiple = (new Multiple())->get($json, $item->json_field);
                     $i = 1;
                     foreach ($valueMultiple as $value) {
-                        $sendData[$filename]['text'][$item->pdf_field . $i] = $value;
+                        $sendData[$filename]['text']['main'][$item->pdf_field . $i] = $value;
                         $i++;
                     }
 
@@ -60,11 +60,35 @@ class FuwMapping extends Model
 
                         foreach ($dates as $key => $date) {
                             if ($key == 0) {
-                                $sendData[$filename]['text'][$date] = date('M', $dateValue[$key]);
+                                $sendData[$filename]['text']['main'][$date] = date('M', $dateValue[$key]);
                             } else {
-                                $sendData[$filename]['text'][$date] = $dateValue[$key];
+                                $sendData[$filename]['text']['main'][$date] = $dateValue[$key];
                             }
                         }
+                    }
+
+                } elseif ($item->options == 'multiple-collect') {
+                    $jsonFields = explode(',', $item->json_field);
+                    $multiple = new Multiple();
+
+                    $valueMultiple = [];
+                    foreach ($jsonFields as $field) {
+                        $valueMultiple[] = $multiple->get($json, $field);
+                    }
+
+                    $collect = [];
+                    foreach ($valueMultiple[0] as $key => $value) {
+                        $string = '';
+                        foreach ($valueMultiple as $data) {
+                            $string .= ' ' . $data[$key] ?? '';
+                        }
+                        $collect[$key] = $string;
+                    }
+
+                    $i = 1;
+                    foreach ($collect as $value) {
+                        $sendData[$filename]['text']['collect'][$item->pdf_field . $i] = $value;
+                        $i++;
                     }
 
                 } else {
@@ -77,14 +101,14 @@ class FuwMapping extends Model
 
                         foreach ($dates as $key => $date) {
                             if ($key == 0) {
-                                $sendData[$filename]['text'][$date] = date('M', $dateValue[$key]);
+                                $sendData[$filename]['text']['main'][$date] = date('M', $dateValue[$key]);
                             } else {
-                                $sendData[$filename]['text'][$date] = $dateValue[$key];
+                                $sendData[$filename]['text']['main'][$date] = $dateValue[$key];
                             }
                         }
                     }
 
-                    $sendData[$filename]['text'][$item->pdf_field] = $value;
+                    $sendData[$filename]['text']['main'][$item->pdf_field] = $value;
                 }
             }
 
@@ -102,7 +126,6 @@ class FuwMapping extends Model
                 } else {
                     $field = $item->json_field;
                     $value = array_get($json, $field);
-//                    $test[] = [$value, $field];
                     if ($value === true) {
                         $value = 'Yes';
                     }

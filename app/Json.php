@@ -835,7 +835,7 @@ class Json
 }';
     }
 
-    public static function new()
+    public static function newJson()
     {
         return '  {
     "insured": {
@@ -3181,7 +3181,8 @@ class Json
       "accountType": "savings",
       "accountNumber": "12345",
       "routingNumber": "123456"
-    }
+    },
+    
   }
 ';
     }
@@ -5500,7 +5501,211 @@ class Json
           "selected": true,
           "reason": "my details..."
         }
-      ]
+      ],
+      "aviationHours": {
+    "past": "past 12 m",
+    "future": "expected 12 m"
+  },
+  "aviatorMilitary": "Yes",
+  "aviationActivities": [
+    {
+      "name": "Charter",
+      "id": 1,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Freight Transport",
+      "id": 2,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Crop Dusting",
+      "id": 3,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Instruction",
+      "id": 4,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Test",
+      "id": 5,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Survey",
+      "id": 6,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Sight Seeing",
+      "id": 7,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Mapping",
+      "id": 8,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Aerobatics",
+      "id": 9,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Commercial Photography",
+      "id": 10,
+      "selected": true,
+      "reset": false,
+      "details": null
+    },
+    {
+      "name": "Other",
+      "id": 11,
+      "selected": true,
+      "reset": true,
+      "details": "developer testing other"
+    },
+    {
+      "name": "I do not participate in any aviation activities",
+      "id": 12,
+      "selected": true,
+      "reset": true,
+      "details": null
+    }
+  ],
+  "aviatorMedicalCertificate": {
+    "type": "Class III",
+    "date": "11/11/1111",
+    "denied": "Yes",
+    "details": "develope details"
+  },
+  "aviatorMilitaryDetails": {
+    "answer": null,
+    "branch": "Other",
+    "branchDetails": "develope...",
+    "crewMember": "Yes",
+    "crewMemberDetails": "details member",
+    "duty": "Other",
+    "dutyDetails": "test data...",
+    "airCraftType": "Other",
+    "airCraftTypeDetails": "other test"
+  },
+  "aviatorReprimanded": {
+    "answer": "Yes",
+    "details": "testing provide details"
+  },
+      "aviationLicenses": [
+    {
+      "name": "Instrument Flight Ratings (IFR)",
+      "id": 1,
+      "selected": true,
+      "reset": false
+    },
+    {
+      "name": "Airline Transport (ATP)",
+      "id": 2,
+      "selected": true,
+      "reset": false
+    },
+    {
+      "name": "Private",
+      "id": 3,
+      "selected": true,
+      "reset": false
+    },
+    {
+      "name": "Student",
+      "id": 4,
+      "selected": true,
+      "reset": false
+    },
+    {
+      "name": "Recreational",
+      "id": 5,
+      "selected": true,
+      "reset": false
+    },
+    {
+      "name": "Certified Flight Instructor",
+      "id": 6,
+      "selected": true,
+      "reset": false
+    },
+    {
+      "name": "Commercial",
+      "id": 7,
+      "selected": true,
+      "reset": false
+    },
+     {
+      "name": "I do not have a pilots license but I am a crew member",
+      "id": 8,
+      "selected": true,
+      "reset": true
+    }
+  ], 
+  "aviationPurposes": [
+    {
+      "name": "Pleasure",
+      "id": 1,
+      "selected": true,
+      "hoursFlown1": "Pleasure 12 months",
+      "hoursFlown2": "hours last 12-24",
+      "hoursToFly": "11",
+      "lastFlown": "11/11/1111",
+      "reset": false
+    },
+    {
+      "name": "Business",
+      "id": 2,
+      "selected": true,
+      "hoursFlown1": "Business 12 months",
+      "hoursFlown2": "hours last 12-24",
+      "hoursToFly": "22",
+      "lastFlown": "12/22/2222",
+      "reset": false
+    },
+    {
+      "name": "Commercial",
+      "id": 3,
+      "selected": true,
+      "hoursFlown1": "Commercial 12 months",
+      "hoursFlown2": "hours 12-24",
+      "hoursToFly": "33",
+      "lastFlown": "13/33/3333",
+      "reset": false
+    },
+    {
+      "name": "Military",
+      "id": 4,
+      "selected": true,
+      "hoursFlown1": "Military 12 months",
+      "hoursFlown2": "last 12-24",
+      "hoursToFly": "44",
+      "lastFlown": "14/14/1444",
+      "reset": false
+    }
+  ]
     },
     "payment": {
       "paying": [
