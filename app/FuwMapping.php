@@ -15,15 +15,6 @@ class FuwMapping extends Model
 
     protected $guarded = ['id'];
 
-    protected static function multiple($full, $json)
-    {
-        foreach ($json as $item) {
-            foreach ($full as $value) {
-                dd($item, $value);
-            }
-        }
-    }
-
 
     protected static function getMapping($files, $json)
     {
@@ -38,12 +29,12 @@ class FuwMapping extends Model
             $radioMappingCollection = self::where('type', '=', 'radio')->where('template', 'like', '%' . $filename . '%')->get();
             $checkboxMappingCollection = self::where('type', '=', 'checkbox')->where('template', 'like', '%' . $filename . '%')->get();
 
-
             foreach ($textMappingCollection as $item) {
+                $multiple = new Multiple();
 
                 if ($item->options == 'multiple') {
 
-                    $valueMultiple = (new Multiple())->get($json, $item->json_field);
+                    $valueMultiple = $multiple->get($json, $item->json_field);
                     $i = 1;
                     foreach ($valueMultiple as $value) {
                         $sendData[$filename]['text']['main'][$item->pdf_field . $i] = $value;
@@ -52,7 +43,7 @@ class FuwMapping extends Model
 
                 } elseif ($item->options == 'multiple-date') {
 
-                    $valueMultiple = (new Multiple())->get($json, $item->json_field);
+                    $valueMultiple = $multiple->get($json, $item->json_field);
 
                     foreach ($valueMultiple as $value) {
                         $dates = explode(',', $item->pdf_field);

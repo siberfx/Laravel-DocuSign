@@ -5705,6 +5705,186 @@ class Json
       "lastFlown": "14/14/1444",
       "reset": false
     }
+  ],
+  "divingTypes": {
+    "rec": true,
+    "ice": true,
+    "cave": true,
+    "construction": true,
+    "search": true,
+    "wreck": true,
+    "wrecknon": true
+  },
+  "divingOther": "Yes",
+  "divingOtherDetails": "test details for participated ",
+  "divingAlone": "Yes",
+  "divingAloneDetails": "text for dive alone",
+  "divingTypesDetails": "test details",
+  "divingCertified": "Yes",
+  "divingCertifiedDetails": {
+    "level": "my level one",
+    "organization": "my level two"
+  },
+  "racing": {
+    "purpose": "Amateur",
+    "trackType": "test type have raced",
+    "vehicleType": "test Vehicle type",
+    "vehicleClass": "test Sanctioning ",
+    "vehicleEngine": "test Engine",
+    "maxSpeed": "200",
+    "averageSpeed": "90",
+    "racesPast": "24",
+    "racesFuture": "12",
+    "dragRacing": "Yes",
+    "dragRacingMinutes": "min",
+    "dragRacingSeconds": "sec",
+    "diciplined": "Yes",
+    "diciplinedDetails": "test details"
+  },
+  "aerialSportsDetails": {
+    "competitions": "Yes",
+    "competitionsDetails": "testing details",
+    "club": "test data",
+    "experimental": "Yes",
+    "heightFlown": "heig",
+    "distanceFlown": "dist",
+    "durationFlown": "dur"
+  },
+    "climbingDetails": {
+    "length": "1 to 3 years",
+    "climbs1": "Trail..",
+    "climbs2": "Rock",
+    "climbs3": "Build",
+    "climbs4": "ACW",
+    "climbs5": "Abseling",
+    "climbs6": "Ice",
+    "climbedAlone": "Yes",
+    "climbedWithoutRope": "Yes",
+    "climbedLocation": "location lvl",
+    "climbedDays": "Average ",
+    "climbedHeight": "Height achieved",
+    "climbedDifficulty": "Difficulty ",
+    "equipment": "What type of equipment do you typically use?",
+    "futureLocation": "Location 12",
+    "futureHeight": "Height",
+    "futureDifficulty": "Difficulty ",
+    "pastLocation": "Location 24",
+    "pastDays": "Average ",
+    "pastHeight": "Height "
+  },
+  "jumping": {
+    "activity": "Activity",
+    "location": "Location ",
+    "pastFrequency": "24 months",
+    "futureFrequency": "12 months",
+    "club": "What club or organization are you"
+  },
+  "travelAbroad": "Yes",
+      "destinations": [
+        {
+          "duration": "1 week",
+          "frequency": "2",
+          "purpose": "Business",
+          "name": "Country 1"
+        },
+        {
+          "duration": "3 weeks",
+          "frequency": "3",
+          "purpose": "Personal",
+          "name": "Country 2"
+        }
+      ],
+      "businessAbroad": {
+          "answer": "Yes",
+          "details": "555555"
+      },
+      "residenceAbroad": {
+          "answer": "Yes",
+          "details": "666666"
+      },
+    "aerialSports": [
+    {
+      "name": "Skydiving/Parachuting",
+      "id": 1,
+      "selected": true,
+      "reset": false,
+      "pastFrequency": "skyd 24",
+      "futureFrequency": "skyd 12",
+      "years": "<1",
+      "status": "Amateur"
+    },
+    {
+      "name": "Hang Gliding",
+      "id": 2,
+      "selected": true,
+      "reset": false,
+      "pastFrequency": "hang 24",
+      "futureFrequency": "hang 12",
+      "years": "1-2",
+      "status": "Professional"
+    },
+    {
+      "name": "Ballooning",
+      "id": 3,
+      "selected": true,
+      "reset": false,
+      "pastFrequency": "ball 24",
+      "futureFrequency": "ball 12",
+      "years": "5 or more",
+      "status": "Amateur"
+    }
+  ],
+  "divingDepths": [
+    {
+      "name": "<30 feet",
+      "id": 1,
+      "selected": true,
+      "reset": false,
+      "futureNumber": "Number 12-30",
+      "futureAverageTime": "Avg Time 12",
+      "pastNumber": "Number 24-30",
+      "pastAverageTime": "Avg Time 24"
+    },
+    {
+      "name": "30-65 feet",
+      "id": 2,
+      "selected": true,
+      "reset": false,
+      "futureNumber": "Number 12-65",
+      "futureAverageTime": "Avg Time 12-30",
+      "pastNumber": "Number 24-60",
+      "pastAverageTime": "Avg Time 24-30"
+    },
+    {
+      "name": "66-130 feet",
+      "id": 3,
+      "selected": true,
+      "reset": false,
+      "futureNumber": "Number 12-66",
+      "futureAverageTime": "Avg Time 12-66",
+      "pastNumber": "Number 24-130",
+      "pastAverageTime": "Avg Time 24-66"
+    },
+    {
+      "name": "131-200 feet",
+      "id": 4,
+      "selected": true,
+      "reset": false,
+      "futureNumber": "Number 12-131",
+      "futureAverageTime": "Avg Time 12-131",
+      "pastNumber": "Number 24-131",
+      "pastAverageTime": "Avg Time 24-131"
+    },
+    {
+      "name": ">200 feet",
+      "id": 5,
+      "selected": true,
+      "reset": false,
+      "futureNumber": "Number 12-200",
+      "futureAverageTime": "Avg Time 12-200",
+      "pastNumber": "Number 24-200",
+      "pastAverageTime": "Avg Time 24-200"
+    }
   ]
     },
     "payment": {
