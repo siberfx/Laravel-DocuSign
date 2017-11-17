@@ -1044,6 +1044,7 @@ class Json
       "healthInsuranceProvider": "Test text",
       "dentistHygenistVisit": "Yes",
       "hasPrimaryPhysician": true,
+      
       "involuntaryWeight": [
         {
           "name": "Yes (Gained)",
@@ -3396,6 +3397,30 @@ class Json
       "healthInsuranceProvider": "Test text",
       "dentistHygenistVisit": "Yes",
       "hasPrimaryPhysician": true,
+      "neverUsedAlcohol": true,
+      "alcohol": [
+    {
+      "type_x": "Beer",
+      "amount": "88",
+      "frequency": "Day",
+      "usedFrom": "11/1111",
+      "usedTo": "22/2222"
+    },
+    {
+      "type_x": "Wine",
+      "amount": "77",
+      "frequency": "Week",
+      "usedFrom": "13/3333",
+      "usedTo": "14/4444"
+    },
+    {
+      "type_x": "Liquor",
+      "amount": "66",
+      "frequency": "Month",
+      "usedFrom": "21/1111",
+      "usedTo": "31/1111"
+    }
+  ],
       "involuntaryWeight": [
         {
           "name": "Yes (Gained)",

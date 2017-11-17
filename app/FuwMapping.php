@@ -107,13 +107,24 @@ class FuwMapping extends Model
                 if ($item->options == 'multiple' and $item->max_range_items == 2) {
                     $full = explode('.', $item->json_field);
                     $i = 1;
-                    foreach ($json[$full[0]] as $key => $datum) {
-                        $value = array_get($datum, $full[1]);
-                        if (is_array($value))
-                            $value = array_get($datum, $full[1] . '.' . $full[2]);
-                        $sendData[$filename]['radio'][$item->pdf_field . $i] = $value;
-                        $i++;
+                    if (isset($json[$full[0]][0])) {
+                        foreach ($json[$full[0]] as $key => $datum) {
+                            $value = array_get($datum, $full[1]);
+                            if (is_array($value))
+                                $value = array_get($datum, $full[1] . '.' . $full[2]);
+                            $sendData[$filename]['radio'][$item->pdf_field . $i] = $value;
+                            $i++;
+                        }
+                    } else {
+                        foreach ($json[$full[0]][$full[1]] as $key => $datum) {
+                            $value = array_get($datum, $full[2]);
+                            if (is_array($value))
+                                $value = array_get($datum, $full[1] . '.' . $full[2]);
+                            $sendData[$filename]['radio'][$item->pdf_field . $i] = $value;
+                            $i++;
+                        }
                     }
+
                 } else {
                     $field = $item->json_field;
                     $value = array_get($json, $field);

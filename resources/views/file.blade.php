@@ -3,7 +3,7 @@
     <title>
         File
     </title>
-    <link rel="stylesheet" href="/public/css/app.css">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body>
 
@@ -30,6 +30,11 @@
                         <input name="1" class="form-control" type="file">
                         <input name="2" class="form-control" type="file">
                         <input name="3" class="form-control" type="file">
+                        <input name="4" class="form-control" type="file">
+                        <input name="5" class="form-control" type="file">
+                        <input name="6" class="form-control" type="file">
+                        <input name="7" class="form-control" type="file">
+                        <input name="8" class="form-control" type="file">
                         <br>
                         <button type="submit" class="btn btn-primary btn-labeled pull-right">
                             Send
