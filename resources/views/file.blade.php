@@ -1,11 +1,5 @@
-<html>
-<head>
-    <title>
-        File
-    </title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-</head>
-<body>
+@extends('layout')
+@section('content')
 
 <form method="post" enctype="multipart/form-data">
     {{ csrf_field() }}
@@ -47,5 +41,4 @@
     </div>
 </form>
 
-</body>
-</html>
+@endsection

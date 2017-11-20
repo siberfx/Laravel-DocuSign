@@ -37,7 +37,15 @@ class FuwMapping extends Model
                     $valueMultiple = $multiple->get($json, $item->json_field);
                     $i = 1;
                     foreach ($valueMultiple as $value) {
-                        $sendData[$filename]['text']['main'][$item->pdf_field . $i] = $value;
+                        # overflow value
+                        if ($item->limit < $i and $item->limit != null) {
+                            $section = str_replace(' ', '_', $item->section);
+                            $document = str_replace(' ', '_', $item->filename);
+
+                            $sendData['overflow'][$document][$section][$item->pdf_field . $i] = $value;
+                        } else {
+                            $sendData[$filename]['text']['main'][$item->pdf_field . $i] = $value;
+                        }
                         $i++;
                     }
 
@@ -78,7 +86,15 @@ class FuwMapping extends Model
 
                     $i = 1;
                     foreach ($collect as $value) {
-                        $sendData[$filename]['text']['collect'][$item->pdf_field . $i] = $value;
+                        # overflow value
+                        if ($item->limit < $i and $item->limit != null) {
+                            $section = str_replace(' ', '_', $item->section);
+                            $document = str_replace(' ', '_', $item->filename);
+
+                            $sendData['overflow'][$document][$section][$item->pdf_field . $i] = $value;
+                        } else {
+                            $sendData[$filename]['text']['collect'][$item->pdf_field . $i] = $value;
+                        }
                         $i++;
                     }
 
@@ -104,7 +120,7 @@ class FuwMapping extends Model
             }
 
             foreach ($radioMappingCollection as $item) {
-                if ($item->options == 'multiple' and $item->max_range_items == 2) {
+                if ($item->options == 'multiple' and $item->limit == 2) {
                     $full = explode('.', $item->json_field);
                     $i = 1;
                     if (isset($json[$full[0]][0])) {
@@ -136,7 +152,7 @@ class FuwMapping extends Model
             }
 
             foreach ($checkboxMappingCollection as $item) {
-                if ($item->options == 'multiple' and $item->max_range_items == 2) {
+                if ($item->options == 'multiple' and $item->limit == 2) {
                     $full = explode('.', $item->json_field);
                     $i = 1;
                     foreach ($json[$full[0]] as $key => $datum) {
@@ -166,6 +182,8 @@ class FuwMapping extends Model
     protected static function control($data)
     {
         foreach ($data as $key => $item) {
+            if ($key == 'overflow')
+                continue;
             if (empty($item['text']))
                 $data[$key]['text'] = [];
             if (empty($item['radio']))

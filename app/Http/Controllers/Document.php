@@ -134,11 +134,6 @@ class Document extends Controller
     }
 
 
-    public function show()
-    {
-        return view('file');
-    }
-
     public function create(Request $request)
     {
         $userData = [
@@ -148,13 +143,32 @@ class Document extends Controller
             'file' => $request->file(),
             'json' => json_decode(Json::get(), true)
         ];
-//        dd($userData);
+        $sendData = FuwMapping::getMapping($userData['file'], $userData['json']);
+
+        $overflow = [];
+        foreach ($sendData['overflow'] as $filename => $files){
+            foreach ($files as $section => $tabs){
+                foreach ($tabs as $field => $value) {
+                    $number = substr($field, -1);
+                    $overflow[$filename][$section][$number][] = $value;
+                }
+            }
+        }
+//        dd($overflow);
+        return view('overflow', [
+            'overflow' => $overflow
+        ]);
+
         $finalUrl = $this->sendFile($userData);
 
         dd($finalUrl);
     }
 
-
+    /**
+     * save error to data base, and send to mail
+     *
+     * @param $e
+     */
     public function saveAndSendError($e)
     {
         # create log error to DB
