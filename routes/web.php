@@ -18,6 +18,9 @@ Route::post('/get/file', 'Document@create')->name('create');
 Route::get('/get/file', 'PageController@showFormFile')->name('show');
 Route::get('/overflow', 'PageController@showOverflow')->name('overflow');
 
-
+Route::get('/test', function () {
+    $a = view('file')->render();
+    dd($a);
+});
 
 

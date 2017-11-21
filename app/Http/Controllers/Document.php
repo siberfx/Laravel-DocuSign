@@ -8,6 +8,8 @@ use App\FuwMapping;
 use App\Json;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Mpdf\Mpdf;
+use Mpdf\Output\Destination;
 
 class Document extends Controller
 {
@@ -136,6 +138,7 @@ class Document extends Controller
 
     public function create(Request $request)
     {
+        $start = microtime(true);
         $userData = [
             'name' => $request->username,
             'email' => $request->email,
@@ -154,14 +157,20 @@ class Document extends Controller
                 }
             }
         }
-//        dd($overflow);
-        return view('overflow', [
+
+        $page = view('overflow', [
             'overflow' => $overflow
-        ]);
+        ])->render();
+
+        $mpdf = new Mpdf();
+        $mpdf->WriteHTML($page);
+        $sectionK = $mpdf->Output($page ,Destination::STRING_RETURN);
+        $userData['pdf'] = $sectionK;
 
         $finalUrl = $this->sendFile($userData);
 
-        dd($finalUrl);
+        $timeScript = round(microtime(true) - $start, 4);
+        dd($finalUrl, $timeScript);
     }
 
     /**

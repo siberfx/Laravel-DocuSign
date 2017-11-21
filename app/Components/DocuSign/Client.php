@@ -143,6 +143,44 @@ class Client
             $id++;
         }
 
+        $overflow = $userData['pdf'];
+        $file_data_string .= "--myboundary\r\n"
+            . "Content-Type:application/pdf\r\n"
+            . "Content-Disposition: file; filename=\"overflow.pdf\"; documentid=$id \r\n"
+            . "\r\n"
+            . "$overflow\r\n";
+
+        $compositeTemplates[] = [
+            'inlineTemplates' => [
+                [
+                    'sequence' => '1',
+                    'recipients' => [
+                        'signers' => [
+                            [
+                                'email' => $userData['email'],
+                                'name' => $userData['name'],
+                                'recipientId' => '1',
+                                'clientUserId' => $userData['email'],
+                                'routingOrder' => '1',
+                                'tabs' => [
+                                    "textTabs" => [],
+                                    "radioGroupTabs" => [],
+                                    "checkboxTabs" => []
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'document' => [
+                'documentId' => $id,
+                'name' => 'overflow.pdf'
+//                'transformPdfFields' => 'true'
+            ]
+        ];
+//        dd($file_data_string);
+//        dd($compositeTemplates);
+
         $json = json_encode([
             'status' => 'sent',
             'emailSubject' => $userData['emailSubject'],
