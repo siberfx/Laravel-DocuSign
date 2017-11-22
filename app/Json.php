@@ -20,7 +20,7 @@ class Json
       "city": "Forest Hills",
       "state": "NY",
       "zip": "11375",
-      "dob": "01/01/1980",
+      "dob": "  01/01/1980",
       "birthCountry": "USA",
       "birthState": "AL",
       "citizenship": "USA",

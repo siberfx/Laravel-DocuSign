@@ -29,14 +29,21 @@ class FuwMapping extends Model
             $radioMappingCollection = self::where('type', '=', 'radio')->where('template', 'like', '%' . $filename . '%')->get();
             $checkboxMappingCollection = self::where('type', '=', 'checkbox')->where('template', 'like', '%' . $filename . '%')->get();
 
+            /**
+             * create text tabs
+             */
             foreach ($textMappingCollection as $item) {
                 $multiple = new Multiple();
 
-                if ($item->options == 'multiple') {
+                if ($item->options == 'multiple' or $item->options == 'multiple-ssn') {
 
                     $valueMultiple = $multiple->get($json, $item->json_field);
                     $i = 1;
                     foreach ($valueMultiple as $value) {
+                        #indent
+                        if ($item->options == 'multiple-ssn') {
+                            self::ssn($value);
+                        }
                         # overflow value
                         if ($item->limit < $i and $item->limit != null) {
                             $section = str_replace(' ', '_', $item->section);
@@ -105,22 +112,31 @@ class FuwMapping extends Model
                     if ($item->options == 'date' and $value != null) {
                         $dates = explode(',', $item->pdf_field);
                         $dateValue = explode('/', $value);
+                        #indent
+                        $year = $dateValue[2];
+                        $month = date('M', $dateValue[0]);
+                        $dateValue[0] = '  ' . substr($month, 0, 1) . '   ' . substr($month, 1, 1) . '   ' . substr($month, -1);;
+                        $dateValue[1] = ' ' . substr($dateValue[1], 0, 1) . '   ' . substr($dateValue[1], -1);
+                        $dateValue[2] = ' ' . substr($year, 0, 1) . '   ' . substr($year, 1, 1) . '   ' . substr($year, 2, 1) . '  ' . substr($year, -1);
 
                         foreach ($dates as $key => $date) {
-                            if ($key == 0) {
-                                $sendData[$filename]['text']['main'][$date] = date('M', $dateValue[$key]);
-                            } else {
-                                $sendData[$filename]['text']['main'][$date] = $dateValue[$key];
-                            }
+                            $sendData[$filename]['text']['main'][$date] = $dateValue[$key];
                         }
+                    }
+                    #indent
+                    if ($item->options == 'ssn') {
+                        self::ssn($value);
                     }
 
                     $sendData[$filename]['text']['main'][$item->pdf_field] = $value;
                 }
             }
 
+            /**
+             * create radio tabs
+             */
             foreach ($radioMappingCollection as $item) {
-                if ($item->options == 'multiple' and $item->limit == 2) {
+                if ($item->options == 'multiple') {
                     $full = explode('.', $item->json_field);
                     $i = 1;
                     if (isset($json[$full[0]][0])) {
@@ -140,7 +156,6 @@ class FuwMapping extends Model
                             $i++;
                         }
                     }
-
                 } else {
                     $field = $item->json_field;
                     $value = array_get($json, $field);
@@ -151,8 +166,11 @@ class FuwMapping extends Model
                 }
             }
 
+            /**
+             * create checkbox tabs
+             */
             foreach ($checkboxMappingCollection as $item) {
-                if ($item->options == 'multiple' and $item->limit == 2) {
+                if ($item->options == 'multiple') {
                     $full = explode('.', $item->json_field);
                     $i = 1;
                     foreach ($json[$full[0]] as $key => $datum) {
@@ -172,9 +190,7 @@ class FuwMapping extends Model
             }
         }
 
-//        dd($test);
         $sendData = self::control($sendData);
-
         return $sendData;
     }
 
@@ -192,5 +208,14 @@ class FuwMapping extends Model
                 $data[$key]['checkbox'] = [];
         }
         return $data;
+    }
+
+
+    protected static function ssn($value)
+    {
+        $value = ' ' . substr($value, 0, 1) . '   ' . substr($value, 1, 1) . '   ' . substr($value, 2, 3) . '  ' . substr($value, 5, 2)
+            . substr($value, 7, 1) . '  ' . substr($value, 8, 1) . '   ' . substr($value, 9, 1) . '   ' . substr($value, -1);
+        $value = str_replace('-', '    ', $value);
+        return $value;
     }
 }
